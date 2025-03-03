@@ -165,6 +165,9 @@ void display_grid(void)
 
 int ask_action(void)
 {
+    /*
+    Ask the user where to play
+    */
     int action;
     scanf("%d", &action);
 
@@ -178,6 +181,9 @@ int ask_action(void)
 
 int check_validity(struct pos *play)
 {
+    /*
+    Checks if the position given by user is a valid play
+    */
     if (play->column < 0 || play->column >= COLUMNS)
     {
         printf("\nInvalid column number");
@@ -199,6 +205,9 @@ int check_validity(struct pos *play)
 
 void update_grid(struct pos *play, int player_turn)
 {
+    /*
+    Update the grid with the most recent play
+    */
     if (player_turn == 1)
     {
         grid[play->row][play->column] = TOKEN1;
@@ -213,6 +222,9 @@ void update_grid(struct pos *play, int player_turn)
 
 int check_win(struct pos *play, int player)
 {
+    /*
+    Checks if the last play made a player win or tied the game
+    */
     // TIE
     int tie = 1;
     for (int i = 0; i < COLUMNS; i++)
