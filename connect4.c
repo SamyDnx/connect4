@@ -25,7 +25,7 @@ int check_validity(struct pos *);
 void update_grid(struct pos *, int);
 
 
-char grid[COLUMNS][ROWS];
+char grid[ROWS][COLUMNS];
 
 
 int main (void)
@@ -43,28 +43,31 @@ int main (void)
         printf("Joueur %d: ", player_turn);
 
         action = ask_action();
+        printf("\naction: %d", action);
         
         int validity;
         struct pos *play;
-        switch (action)
+        if (action == ACT_ERR)
         {
-            case ACT_ERR:
-                printf("\n");
-                printf("Unexpected input");
-                return 1;
-                break;
-            case ACT_STOP:
-                printf("\n");
-                printf("Game exited by player %d", player_turn);
-                return 0;
-                break;
-            default:
-                play = &(struct pos) { .column = action, .row = 0};
-                validity = check_validity(play);
-                break;
+            printf("\n");
+            printf("Unexpected input");
+            return 1;
         }
-
-        if (validity)
+        else if (action == ACT_STOP)
+        {
+            printf("\n");
+            printf("Game exited by player %d", player_turn);
+            return 0;
+        }
+        else
+        {
+            play = &(struct pos) { .column = action, .row = 0};
+            printf("\nplay: %d:%d", play->column, play->row);
+            validity = check_validity(play);
+            printf("\nvalidity: %d\n", validity);
+        }
+        
+        if (validity == 1)
         {
             update_grid(play, player_turn);
             player_turn = 3 - player_turn;
@@ -81,14 +84,14 @@ void initialise_grid(void)
     Inistialise grid with withespace char
     */
 
-    unsigned cols;
-    unsigned rows;
+    unsigned row;
+    unsigned col;
 
-    for(cols = 0; cols < COLUMNS; cols++)
+    for(row = 0; row < ROWS; row++)
     {
-        for(rows = 0; rows < ROWS; rows++)
+        for(col = 0; col < COLUMNS; col++)
         {
-            grid[cols][rows] = ' ';
+            grid[row][col] = ' ';
         }
     }
 }
@@ -148,7 +151,6 @@ void display_grid(void)
 int ask_action(void)
 {
     int action;
-
     scanf("%d", &action);
 
     if (action >= 1 && action <= 7)
@@ -161,28 +163,21 @@ int ask_action(void)
 
 int check_validity(struct pos *play)
 {
-    if (play->column < 1 || play->column > 7)
+    if (play->column < 0 || play->column > 6)
     {
         return 0;
     }
-    else
+
+    for (play->row = ROWS - 1; play->row >= 0; play->row--)
     {
-        struct pos *play = &(struct pos) {.column = play->column, .row = 0};
-        for (unsigned row = 0; row < ROWS; row++)
+        if (grid[play->row][play->column] == ' ')
         {
-            if (row == 0 && grid[play->row][play->column] != ' ')
-            {
-                printf("\nCoup Invalide");
-                return 0;
-            }
-            else if (row != 0 && grid[play->row][play->column] != ' ')
-            {
-                return 1;
-            }
-            play->row++;
+            return 1;
         }
-        return 1;
     }
+
+    printf("\nColumn is full");
+    return 1;
 }
 
 void update_grid(struct pos *play, int player_turn)
