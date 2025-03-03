@@ -48,7 +48,6 @@ int main (void)
         printf("Joueur %d: ", player_turn);
 
         action = ask_action();
-        printf("\naction: %d", action);
         
         int validity;
         struct pos *play;
@@ -67,9 +66,7 @@ int main (void)
         else
         {
             play = &(struct pos) { .column = action, .row = 0};
-            printf("\nplay: %d:%d", play->column, play->row);
             validity = check_validity(play);
-            printf("\nvalidity: %d\n", validity);
         }
         
         if (validity == 1)
@@ -181,21 +178,23 @@ int ask_action(void)
 
 int check_validity(struct pos *play)
 {
-    if (play->column < 0 || play->column > 6)
+    if (play->column < 0 || play->column >= COLUMNS)
     {
+        printf("\nInvalid column number");
         return 0;
     }
-
-    for (play->row = ROWS - 1; play->row >= 0; play->row--)
+    
+    for (int r = ROWS - 1; r >= 0; r--)
     {
-        if (grid[play->row][play->column] == ' ')
+        if (grid[r][play->column] == ' ')
         {
+            play->row = r;
             return 1;
         }
     }
-
+    
     printf("\nColumn is full");
-    return 1;
+    return 0;
 }
 
 void update_grid(struct pos *play, int player_turn)
@@ -272,7 +271,7 @@ int check_win(struct pos *play, int player)
         }
     }
     
-    // Check diagonal (top-left to bottom-right)
+    // Diag (top-left to bottom-right)
     for (int startRow = 0; startRow <= ROWS - 4; startRow++) {
         for (int startCol = 0; startCol <= COLUMNS - 4; startCol++) {
             cnt = 0;
@@ -287,7 +286,7 @@ int check_win(struct pos *play, int player)
         }
     }
     
-    // Check diagonal (top-right to bottom-left)
+    // Diag (top-right to bottom-left)
     for (int startRow = ROWS - 1; startRow >= 3; startRow--) {
         for (int startCol = 0; startCol <= COLUMNS - 4; startCol++) {
             cnt = 0;
