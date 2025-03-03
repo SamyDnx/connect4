@@ -20,6 +20,11 @@ struct pos
     unsigned row;
 };
 
+/*
+TODO: 
+    - AI to play single plyer
+    - File system to save game during or after the game
+*/
 
 // Prototypes
 void initialise_grid(void);
