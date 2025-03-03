@@ -10,6 +10,10 @@
 #define ACT_STOP 8
 #define ACT_ERR 9
 
+#define STATUS_DNF 0
+#define STATUS_WIN 1
+#define STATUS_TIE 2
+
 struct pos
 {
     unsigned column;
@@ -23,6 +27,7 @@ void display_grid(void);
 int ask_action(void);
 int check_validity(struct pos *);
 void update_grid(struct pos *, int);
+int check_win(struct pos *, int);
 
 
 char grid[ROWS][COLUMNS];
@@ -70,11 +75,24 @@ int main (void)
         if (validity == 1)
         {
             update_grid(play, player_turn);
-            player_turn = 3 - player_turn;
+            int win = check_win(play, player_turn);
+            if (win == STATUS_WIN)
+            {
+                printf("\nPlayer %d wins the match !!!", player_turn);
+                return 0;
+            }
+            else if (win == STATUS_TIE)
+            {
+                printf("\nTIE !!!");
+                return 0;
+            }
+            else
+            {
+                player_turn = 3 - player_turn;
+            }
         }
 
     }
-
     return 0;
 }
 
@@ -192,4 +210,97 @@ void update_grid(struct pos *play, int player_turn)
     }
 
     display_grid();
+}
+
+int check_win(struct pos *play, int player)
+{
+    // TIE
+    int tie = 1;
+    for (int i = 0; i < COLUMNS; i++)
+    {
+        if (grid[0][i] == ' ')
+        {
+            tie = 0;
+            break;
+        }
+    }
+
+    if (tie == 1)
+    {
+        return STATUS_TIE;
+    }
+
+    // WIN
+    char token = (player == 1) ? TOKEN1 : TOKEN2;
+    unsigned col = play->column;
+    unsigned row = play->row;
+    int cnt;
+
+    // Verticql
+    cnt = 0;
+    for(int r = 0; r < ROWS; r++)
+    {
+        if (grid[r][col] == token)
+        {
+            cnt++;
+        }
+        else
+        {
+            cnt = 0;
+        }
+        if (cnt >= 4)
+        {
+            return STATUS_WIN;
+        }
+    }
+
+    // Horizontal
+    cnt = 0;
+    for (int c = 0; c < COLUMNS; c++)
+    {
+        if (grid[row][c] == token)
+        {
+            cnt++;
+        }
+        else
+        {
+            cnt = 0;
+        }
+        if (cnt >= 4)
+        {
+            return STATUS_WIN;
+        }
+    }
+    
+    // Check diagonal (top-left to bottom-right)
+    for (int startRow = 0; startRow <= ROWS - 4; startRow++) {
+        for (int startCol = 0; startCol <= COLUMNS - 4; startCol++) {
+            cnt = 0;
+            for (int i = 0; i < 4; i++) {
+                if (grid[startRow + i][startCol + i] == token)
+                    cnt++;
+                else
+                    break;
+            }
+            if (cnt >= 4)
+                return STATUS_WIN;
+        }
+    }
+    
+    // Check diagonal (top-right to bottom-left)
+    for (int startRow = ROWS - 1; startRow >= 3; startRow--) {
+        for (int startCol = 0; startCol <= COLUMNS - 4; startCol++) {
+            cnt = 0;
+            for (int i = 0; i < 4; i++) {
+                if (grid[startRow - i][startCol + i] == token)
+                    cnt++;
+                else
+                    break;
+            }
+            if (cnt >= 4)
+                return STATUS_WIN;
+        }
+    }
+    
+    return STATUS_DNF;
 }
