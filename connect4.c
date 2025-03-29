@@ -22,7 +22,7 @@ struct pos
 
 /*
 TODO: 
-    - AI to play single plyer
+    - AI to play single player
     - File system to save game during or after the game
 */
 
@@ -34,9 +34,7 @@ int check_validity(struct pos *);
 void update_grid(struct pos *, int);
 int check_win(struct pos *, int);
 
-
 char grid[ROWS][COLUMNS];
-
 
 int main (void)
 {
@@ -53,7 +51,7 @@ int main (void)
         printf("Joueur %d: ", player_turn);
 
         action = ask_action();
-        
+
         int validity;
         struct pos *play;
         if (action == ACT_ERR)
@@ -73,7 +71,7 @@ int main (void)
             play = &(struct pos) { .column = action, .row = 0};
             validity = check_validity(play);
         }
-        
+
         if (validity == 1)
         {
             update_grid(play, player_turn);
@@ -136,9 +134,9 @@ void display_grid(void)
     {
         printf("---+");
     }
-    
+
     printf("\n");
-    
+
     for(unsigned row = 0; row < ROWS; row++)
     {
         printf("|");
@@ -155,16 +153,14 @@ void display_grid(void)
         {
             printf("---+");
         }
-        
         printf("\n");
     }
 
-    // Bottom column's number   
+    // Bottom column's number
     for(unsigned col = 0; col < COLUMNS; col++)
     {
         printf("  %d ", col+1);
     }
-
     printf("\n");
 }
 
@@ -173,6 +169,7 @@ int ask_action(void)
     /*
     Ask the user where to play
     */
+
     int action;
     scanf("%d", &action);
 
@@ -189,12 +186,13 @@ int check_validity(struct pos *play)
     /*
     Checks if the position given by user is a valid play
     */
+
     if (play->column < 0 || play->column >= COLUMNS)
     {
         printf("\nInvalid column number");
         return 0;
     }
-    
+
     for (int r = ROWS - 1; r >= 0; r--)
     {
         if (grid[r][play->column] == ' ')
@@ -203,7 +201,7 @@ int check_validity(struct pos *play)
             return 1;
         }
     }
-    
+
     printf("\nColumn is full");
     return 0;
 }
@@ -213,6 +211,7 @@ void update_grid(struct pos *play, int player_turn)
     /*
     Update the grid with the most recent play
     */
+
     if (player_turn == 1)
     {
         grid[play->row][play->column] = TOKEN1;
@@ -230,6 +229,7 @@ int check_win(struct pos *play, int player)
     /*
     Checks if the last play made a player win or tied the game
     */
+
     // TIE
     int tie = 1;
     for (int i = 0; i < COLUMNS; i++)
@@ -287,7 +287,7 @@ int check_win(struct pos *play, int player)
             return STATUS_WIN;
         }
     }
-    
+
     // Diag (top-left to bottom-right)
     for (int startRow = 0; startRow <= ROWS - 4; startRow++) {
         for (int startCol = 0; startCol <= COLUMNS - 4; startCol++) {
@@ -302,7 +302,7 @@ int check_win(struct pos *play, int player)
                 return STATUS_WIN;
         }
     }
-    
+
     // Diag (top-right to bottom-left)
     for (int startRow = ROWS - 1; startRow >= 3; startRow--) {
         for (int startCol = 0; startCol <= COLUMNS - 4; startCol++) {
@@ -317,6 +317,6 @@ int check_win(struct pos *play, int player)
                 return STATUS_WIN;
         }
     }
-    
+
     return STATUS_DNF;
 }
